@@ -1,5 +1,5 @@
 import os
-
+from model import detect_peaks_in_song
 from flask import Flask, render_template, request
 from flask_dropzone import Dropzone
 
@@ -21,8 +21,10 @@ dropzone = Dropzone(app)
 def upload():
     if request.method == 'POST':
         f = request.files.get('file')
-        f.save(os.path.join(app.config['UPLOADED_PATH'], f.filename))
-
+        path = os.path.join(app.config['UPLOADED_PATH'], f.filename)
+        f.save(path)
+        array_of_peaks = detect_peaks_in_song(path)
+        return array_of_peaks
     return render_template('index.html')
 
 
