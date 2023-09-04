@@ -35,18 +35,9 @@ def separate(inp=None, outp=None, model="htdemucs", mp3=True, mp3_rate=320, floa
 def find_files(in_path, extensions=["wav", "mp3", "m4a", "flac"]):
     return [file for file in Path(in_path).iterdir() if file.suffix.lower().lstrip(".") in extensions]
 
-
-# Paths
-# Adjust this to your directory containing audio files
-in_path = "uploads/"
-# Adjust this to your desired output directory
-out_path = "output/"
-
-# Separate vocals using Demucs
 separate()
 
 # Load the separated vocal track (adjust path as needed)
-# Adjust this to the path of separated vocal track
 audio_file_path = "output/htdemucs/kathak_1/vocals.mp3"
 audio, sr = librosa.load(audio_file_path)
 
@@ -54,6 +45,20 @@ audio, sr = librosa.load(audio_file_path)
 onset_env = librosa.onset.onset_strength(y=audio, sr=sr)
 onset_frames = librosa.onset.onset_detect(onset_envelope=onset_env, sr=sr)
 onset_times = librosa.frames_to_time(onset_frames, sr=sr)
+
+# Open COM port 3
+try:
+    ser = serial.Serial('COM3', 9600, timeout=1)
+except Exception as e:
+    print(f"Failed to open COM port: {e}")
+    exit(1)
+
+# Write onset timestamps to COM port 3
+for time in onset_times:
+    ser.write(f"{time}\n".encode())
+
+# Close the COM port
+ser.close()
 
 # Plot
 fig, ax = plt.subplots(figsize=(10, 6))
