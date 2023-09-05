@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 
 
 def separate(filename=None,inp=None, outp=None, model="htdemucs", mp3=True, mp3_rate=320, float32=False, int24=False, two_stems=None):
-    inp = inp or in_path
-    outp = outp or out_path
+    inp = inp
+    outp = outp
     cmd = ["python", "-m", "demucs.separate", "-o", str(outp), "-n", model]
     if mp3:
         cmd += ["--mp3", f"--mp3-bitrate={mp3_rate}"]
