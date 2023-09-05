@@ -2,6 +2,7 @@ import os
 import subprocess as sp
 import librosa
 import serial
+from model import separate
 from flask import Flask, render_template, request
 from flask_dropzone import Dropzone
 
@@ -34,6 +35,8 @@ def upload():
 
         try:
             f.save(path)
+        # Call the separate function from model.py
+        separate(filename=f.filename,inp=path)
         except Exception as e:
             return f"Could not save file: {e}"
 
