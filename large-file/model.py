@@ -35,6 +35,33 @@ def separate(filename=None,inp=None, outp=None, model="htdemucs", mp3=True, mp3_
     onset_env = librosa.onset.onset_strength(y=audio, sr=sr)
     onset_frames = librosa.onset.onset_detect(onset_envelope=onset_env, sr=sr)
     onset_times = librosa.frames_to_time(onset_frames, sr=sr)
+    print("Onset Timestamps:", onset_times)
+    fig, ax = plt.subplots(figsize=(10, 6))
+    librosa.display.waveshow(audio, sr=sr, alpha=0.5)
+
+    for time in onset_times:
+        ax.axvline(x=time, color='r', linestyle='--', linewidth=1)
+    plt.title('Onset Detection Visualization')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Amplitude')
+    plt.legend(['Waveform', 'Detected Onsets'])
+    plt.xlim(15, 50)
+    plt.tight_layout()
+    plt.show()
+    
+    print("Onset Timestamps:", onset_times)
+    try:
+        ser = serial.Serial('COM3', 9600, timeout=1)
+    except Exception as e:
+        print(f"Failed to open COM port: {e}")
+        exit(1)
+    
+    # Write onset timestamps to COM port 3
+    for time in onset_times:
+        ser.write(f"{time}\n".encode())
+    
+    # Close the COM port
+    ser.close()
 def find_files(in_path, extensions=["wav", "mp3", "m4a", "flac"]):
     return [file for file in Path(in_path).iterdir() if file.suffix.lower().lstrip(".") in extensions]
 
@@ -49,19 +76,7 @@ if __name__ == "__main__":
     onset_env = librosa.onset.onset_strength(y=audio, sr=sr)
     onset_frames = librosa.onset.onset_detect(onset_envelope=onset_env, sr=sr)
     onset_times = librosa.frames_to_time(onset_frames, sr=sr)
-    print("Onset Timestamps:", onset_times)
-    try:
-        ser = serial.Serial('COM3', 9600, timeout=1)
-    except Exception as e:
-        print(f"Failed to open COM port: {e}")
-        exit(1)
     
-    # Write onset timestamps to COM port 3
-    for time in onset_times:
-        ser.write(f"{time}\n".encode())
-    
-    # Close the COM port
-    ser.close()
     
     
     
