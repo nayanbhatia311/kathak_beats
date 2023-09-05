@@ -5,7 +5,7 @@ import librosa.display
 import matplotlib.pyplot as plt
 
 
-def separate(inp=None, outp=None, model="htdemucs", mp3=True, mp3_rate=320, float32=False, int24=False, two_stems=None):
+def separate(filename=None,inp=None, outp=None, model="htdemucs", mp3=True, mp3_rate=320, float32=False, int24=False, two_stems=None):
     inp = inp or in_path
     outp = outp or out_path
     cmd = ["python", "-m", "demucs.separate", "-o", str(outp), "-n", model]
@@ -30,8 +30,11 @@ def separate(inp=None, outp=None, model="htdemucs", mp3=True, mp3_rate=320, floa
     p.communicate()
     if p.returncode != 0:
         print("Command failed, something went wrong.")
-
-
+    audio_file_path=f'output/htdemucs/{filename}/vocals.mp3'
+    audio, sr = librosa.load(audio_file_path)
+    onset_env = librosa.onset.onset_strength(y=audio, sr=sr)
+    onset_frames = librosa.onset.onset_detect(onset_envelope=onset_env, sr=sr)
+    onset_times = librosa.frames_to_time(onset_frames, sr=sr)
 def find_files(in_path, extensions=["wav", "mp3", "m4a", "flac"]):
     return [file for file in Path(in_path).iterdir() if file.suffix.lower().lstrip(".") in extensions]
 
@@ -45,6 +48,21 @@ audio, sr = librosa.load(audio_file_path)
 onset_env = librosa.onset.onset_strength(y=audio, sr=sr)
 onset_frames = librosa.onset.onset_detect(onset_envelope=onset_env, sr=sr)
 onset_times = librosa.frames_to_time(onset_frames, sr=sr)
+print("Onset Timestamps:", onset_times)
+try:
+    ser = serial.Serial('COM3', 9600, timeout=1)
+except Exception as e:
+    print(f"Failed to open COM port: {e}")
+    exit(1)
+
+# Write onset timestamps to COM port 3
+for time in onset_times:
+    ser.write(f"{time}\n".encode())
+
+# Close the COM port
+ser.close()
+
+
 
 # Open COM port 3
 try:
