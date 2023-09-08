@@ -85,8 +85,8 @@ Before beginning the installation, ensure you have:
 2. Open PowerShell as an administrator.
 3. Navigate to the directory containing the script.
 4. Run the script:
-   ```powershell -ExecutionPolicy Bypass -File .\install_dependencies_windows.ps1
-   .\install_dependencies_windows.ps1
+   ```
+   powershell -ExecutionPolicy Bypass -File .\install_dependencies_windows.ps1
    ```
 
 ### Manual Installation
