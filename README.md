@@ -112,6 +112,6 @@ cd <repository_folder>/large-files/
 python3 -m venv venv  
 source venv/bin/activate (mac or linux)  
 venv\Scripts\activate (on windows)  
-
+pip3 install -r requirements.txt 
 python3 app.py
 
